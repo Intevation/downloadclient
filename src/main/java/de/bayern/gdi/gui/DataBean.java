@@ -26,9 +26,9 @@ import de.bayern.gdi.services.CatalogService;
 import de.bayern.gdi.services.Service;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
-import de.bayern.gdi.utils.Settings.Config;
-import de.bayern.gdi.utils.Service.ServiceChecker;
-import de.bayern.gdi.utils.Service.ServiceSettings;
+import de.bayern.gdi.utils.settings.Config;
+import de.bayern.gdi.utils.service.ServiceChecker;
+import de.bayern.gdi.utils.service.ServiceSettings;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -125,7 +125,7 @@ public class DataBean extends Observable {
                         new CatalogService(serviceSetting.getCatalogueURL());
             } catch (URISyntaxException | IOException e) {
                 throw new IOException(
-                        "Failed to Initialize Calatalog Service: '"
+                        "Failed to Initialize Calatalog service: '"
                                 + serviceSetting.getCatalogueURL()
                                 + "'");
             }
@@ -205,16 +205,16 @@ public class DataBean extends Observable {
     }
 
     /**
-     * Adds a Service to the list.
-     * @param service the Service
+     * Adds a service to the list.
+     * @param service the service
      */
     public void addCatalogServiceToList(Service service) {
         this.catalogServices.add(service);
     }
 
     /**
-     * Adds a Service to the list.
-     * @param service the Service
+     * Adds a service to the list.
+     * @param service the service
      */
     public void addServiceToList(Service service) {
         this.catalogServices.add(service);
@@ -294,7 +294,7 @@ public class DataBean extends Observable {
     }
 
     /**
-     * sets the Attributes for a selected Service.
+     * sets the Attributes for a selected service.
      * @param attributes tha attributes
      */
     public void setAttributes(List<Attribute> attributes) {
@@ -302,7 +302,7 @@ public class DataBean extends Observable {
     }
 
     /**
-     * Adds an attribute for a selected Service.
+     * Adds an attribute for a selected service.
      * @param key The key
      * @param value The value
      * @param type the type of the value

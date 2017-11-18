@@ -31,10 +31,10 @@ import de.bayern.gdi.processor.ExternalProcessJob.Arg;
 import de.bayern.gdi.processor.ExternalProcessJob.DeltaGlob;
 import de.bayern.gdi.processor.ExternalProcessJob.GlobalGlob;
 import de.bayern.gdi.processor.ExternalProcessJob.UniqueArg;
-import de.bayern.gdi.utils.Settings.Config;
+import de.bayern.gdi.utils.settings.Config;
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.Logging.Log;
+import de.bayern.gdi.utils.logging.Log;
 import de.bayern.gdi.utils.StringUtils;
 
 /** Converts processing steps to jobs of external program calls. */

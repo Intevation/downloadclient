@@ -28,7 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import org.w3c.dom.Document;
 
 import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.Logging.Log;
+import de.bayern.gdi.utils.logging.Log;
 import de.bayern.gdi.utils.XML;
 import org.xml.sax.SAXException;
 

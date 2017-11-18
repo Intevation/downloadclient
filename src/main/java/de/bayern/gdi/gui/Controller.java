@@ -37,13 +37,13 @@ import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.DownloadListener;
 import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.Logging.AppLog;
+import de.bayern.gdi.utils.logging.AppLog;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.SelectedAtomPolygon;
-import de.bayern.gdi.utils.Service.ServiceChecker;
-import de.bayern.gdi.utils.Service.ServiceSettings;
-import de.bayern.gdi.utils.Settings.Config;
-import de.bayern.gdi.utils.Settings.DownloadConfig;
+import de.bayern.gdi.utils.service.ServiceChecker;
+import de.bayern.gdi.utils.service.ServiceSettings;
+import de.bayern.gdi.utils.settings.Config;
+import de.bayern.gdi.utils.settings.DownloadConfig;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -1674,7 +1674,7 @@ public class Controller {
     }
 
     /**
-     * Sets the Service Types.
+     * Sets the service Types.
      */
     private void setServiceTypes() {
         if (!dataBean.isWebServiceSet()) {

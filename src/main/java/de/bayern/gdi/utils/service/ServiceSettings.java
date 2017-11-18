@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.utils.Service;
+package de.bayern.gdi.utils.service;
 
 import de.bayern.gdi.services.Service;
 import de.bayern.gdi.utils.XML;

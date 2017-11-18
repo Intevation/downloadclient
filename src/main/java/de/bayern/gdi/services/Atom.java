@@ -27,7 +27,7 @@ import com.vividsolutions.jts.io.WKTReader;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.NamespaceContextMap;
-import de.bayern.gdi.utils.Service.ServiceChecker;
+import de.bayern.gdi.utils.service.ServiceChecker;
 import de.bayern.gdi.utils.XML;
 
 import java.io.IOException;
@@ -320,7 +320,7 @@ public class Atom {
 
         private ArrayList<Field> getFieldForEntry(Document entryDoc) {
             ArrayList<Field> attrFields = new ArrayList<>();
-            //Predefined in ATOM Service
+            //Predefined in ATOM service
             String getCategories = "//entry";
             NodeList cL = (NodeList) XML.xpath(entryDoc,
                     getCategories,
@@ -523,13 +523,13 @@ public class Atom {
                 it.id = id.getTextContent();
             } else {
                 throw new ParserConfigurationException(COULD_NOT_PARSE
-                        + "Service. ID not found");
+                        + "service. ID not found");
             }
             if (title != null) {
                 it.title = titleN.getTextContent();
             } else {
                 throw new ParserConfigurationException(COULD_NOT_PARSE
-                        + "Service. Title not found");
+                        + "service. Title not found");
             }
             if (description != null) {
                 it.description = description.getTextContent();
@@ -540,19 +540,19 @@ public class Atom {
                 it.describedBy = describedBy.getTextContent();
             } else {
                 throw new ParserConfigurationException(COULD_NOT_PARSE
-                        + "Service. DescribedBy not found");
+                        + "service. DescribedBy not found");
             }
             if (entry != null) {
                 it.otherCRSs = getCRS(entry);
             } else {
                 throw new ParserConfigurationException(COULD_NOT_PARSE
-                        + "Service. Entry not found");
+                        + "service. Entry not found");
             }
             if (it.otherCRSs != null) {
                 it.defaultCRS = it.otherCRSs.get(0);
             } else {
                 throw new ParserConfigurationException(COULD_NOT_PARSE
-                        + "Service. CRSs not found");
+                        + "service. CRSs not found");
             }
             it.username = this.username;
             it.password = this.password;
@@ -582,7 +582,7 @@ public class Atom {
                 it.polygon = (Polygon) polygon;
             } else {
                 throw new ParserConfigurationException(COULD_NOT_PARSE
-                        + "Service. Bounding Box not Found");
+                        + "service. Bounding Box not Found");
             }
             items.add(it);
         }
@@ -692,7 +692,7 @@ public class Atom {
 
     private ArrayList<String> getCRS(Node entry) {
         ArrayList<String> crs = new ArrayList<>();
-        //Predefined in ATOM Service
+        //Predefined in ATOM service
         String getCategories = "category";
         NodeList cL = (NodeList) XML.xpath(entry,
                 getCategories,

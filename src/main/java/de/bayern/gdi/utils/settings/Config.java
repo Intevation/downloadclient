@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.utils.Settings;
+package de.bayern.gdi.utils.settings;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProxyConfiguration;
-import de.bayern.gdi.utils.Service.ServiceSettings;
+import de.bayern.gdi.utils.service.ServiceSettings;
 
 import org.xml.sax.SAXException;
 

@@ -18,7 +18,7 @@
 package de.bayern.gdi;
 
 import de.bayern.gdi.gui.Start;
-import de.bayern.gdi.utils.Settings.Config;
+import de.bayern.gdi.utils.settings.Config;
 
 import java.io.IOException;
 

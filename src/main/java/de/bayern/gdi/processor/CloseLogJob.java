@@ -17,7 +17,7 @@
  */
 package de.bayern.gdi.processor;
 
-import de.bayern.gdi.utils.Logging.Log;
+import de.bayern.gdi.utils.logging.Log;
 
 /**
  * A deferred job which ensures that a download logger is closed.

@@ -23,7 +23,7 @@ import de.bayern.gdi.model.Parameter;
 import de.bayern.gdi.model.DownloadStep;
 
 import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.Logging.Log;
+import de.bayern.gdi.utils.logging.Log;
 
 /**
  * A job to log the meta data of a download.

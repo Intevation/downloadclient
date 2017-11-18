@@ -193,7 +193,7 @@ public class CatalogService {
      * retrieves a Map of ServiceNames and URLs for a Filter-Word.
      *
      * @param filter the Word to filter to
-     * @return Map of Service Names and URLs
+     * @return Map of service Names and URLs
      * @throws URISyntaxException if URL is wrong
      * @throws IOException if something in IO is wrong
      */

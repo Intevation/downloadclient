@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.utils.Logging;
+package de.bayern.gdi.utils.logging;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.FileHandler;
 
 /**
- * Trashbin for Logging releated stuff.
+ * Trashbin for logging releated stuff.
  *
  * @author thomas
  */

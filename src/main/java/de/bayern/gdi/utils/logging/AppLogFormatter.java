@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.utils.Logging;
+package de.bayern.gdi.utils.logging;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

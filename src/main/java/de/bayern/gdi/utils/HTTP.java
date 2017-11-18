@@ -17,8 +17,8 @@
  */
 package de.bayern.gdi.utils;
 
-import de.bayern.gdi.utils.Settings.ApplicationSettings;
-import de.bayern.gdi.utils.Settings.Config;
+import de.bayern.gdi.utils.settings.ApplicationSettings;
+import de.bayern.gdi.utils.settings.Config;
 import java.io.IOException;
 import java.net.ProxySelector;
 import java.net.URISyntaxException;

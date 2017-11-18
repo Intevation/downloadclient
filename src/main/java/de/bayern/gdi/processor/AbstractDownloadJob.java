@@ -27,7 +27,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import de.bayern.gdi.utils.CountingInputStream;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.Logging.Log;
+import de.bayern.gdi.utils.logging.Log;
 
 /** A base class for different download jobs. */
 public abstract class AbstractDownloadJob

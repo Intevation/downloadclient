@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.utils.Settings;
+package de.bayern.gdi.utils.settings;
 
 import de.bayern.gdi.utils.Misc;
-import de.bayern.gdi.utils.Service.ServiceSettings;
+import de.bayern.gdi.utils.service.ServiceSettings;
 import de.bayern.gdi.utils.XML;
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,7 +72,7 @@ public class GeneralSettings {
 
     /**
      * Returns service settings manager class.
-     * @return Service settings
+     * @return service settings
      */
     public ServiceSettings getServiceSettings() {
         return this.serviceSettings;

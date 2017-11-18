@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.utils.Service;
+package de.bayern.gdi.utils.service;
 
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.utils.HTTP;
@@ -181,7 +181,7 @@ public class ServiceChecker {
     }
 
     /**
-     * Checks if a Service is restricted.
+     * Checks if a service is restricted.
      *
      * @param url the URL of the service
      * @return true if restriced; false if not

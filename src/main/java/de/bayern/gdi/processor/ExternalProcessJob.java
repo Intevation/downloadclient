@@ -29,10 +29,10 @@ import java.util.Map;
 import java.util.Set;
 
 import de.bayern.gdi.model.ProxyConfiguration;
-import de.bayern.gdi.utils.Settings.Config;
+import de.bayern.gdi.utils.settings.Config;
 import de.bayern.gdi.utils.FileTracker;
 import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.Logging.Log;
+import de.bayern.gdi.utils.logging.Log;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.StringUtils;
 

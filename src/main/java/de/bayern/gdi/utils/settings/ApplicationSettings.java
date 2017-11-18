@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.utils.Settings;
+package de.bayern.gdi.utils.settings;
 
 import java.io.IOException;
 import java.util.HashMap;

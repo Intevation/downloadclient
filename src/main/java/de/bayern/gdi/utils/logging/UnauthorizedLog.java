@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.utils.Logging;
+package de.bayern.gdi.utils.logging;
 
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Unauthorized;

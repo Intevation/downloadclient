@@ -252,7 +252,7 @@ public class WMSMapSwing extends Parent {
      * @param width width
      * @param heigth heigth
      * @param layer layer
-     * @param mapURL The URL of the WMS Service
+     * @param mapURL The URL of the WMS service
      * @throws MalformedURLException
      */
     public WMSMapSwing(String mapURL, int width, int heigth, String layer)
