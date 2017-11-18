@@ -64,7 +64,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -84,7 +83,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javafx.util.Callback;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -430,7 +428,7 @@ public class Controller {
      * @return The chosen file
      * @throws Exception Exception
      */
-    protected File openConfigFileOpenDialog() throws Exception {
+    private File openConfigFileOpenDialog() throws Exception {
         FileChooser fileChooser = new FileChooser();
         File initialDir = new File(System.getProperty(USER_DIR));
         fileChooser.setInitialDirectory(initialDir);
@@ -446,7 +444,7 @@ public class Controller {
      *
      * @param configFile File object holding the config file.
      */
-    public void loadConfigFromFile(File configFile) {
+    private void loadConfigFromFile(File configFile) {
         if (configFile == null) {
             return;
         }
@@ -461,7 +459,6 @@ public class Controller {
             log.log(Level.SEVERE, e.getMessage(), e);
             setStatusTextUI(
                 I18n.format("status.config.invalid-xml"));
-            return;
         } catch (DownloadConfig.NoServiceURLException urlEx) {
             setStatusTextUI(
                 I18n.format("status.config.no-url-provided"));
@@ -511,39 +508,14 @@ public class Controller {
             }
         }
         serviceTypeChooser.setCellFactory(
-            new Callback<ListView<ItemModel>,
-                            ListCell<ItemModel>>() {
-                @Override
-                public ListCell<ItemModel> call(ListView<ItemModel> list) {
-                    return new CellTypes.ItemCell();
-                }
-            });
+            list -> new CellTypes.ItemCell());
         atomVariationChooser.setCellFactory(
-            new Callback<ListView<ItemModel>,
-                            ListCell<ItemModel>>() {
-                @Override
-                public ListCell<ItemModel> call(ListView<ItemModel> list) {
-                    return new CellTypes.ItemCell();
-                }
-            });
+            list -> new CellTypes.ItemCell());
         referenceSystemChooser.setCellFactory(
-            new Callback<ListView<CRSModel>,
-                            ListCell<CRSModel>>() {
-                @Override
-                public ListCell<CRSModel> call(ListView<CRSModel> list) {
-                    return new CellTypes.CRSCell() {
-                    };
-                }
+            list -> new CellTypes.CRSCell() {
             });
         dataFormatChooser.setCellFactory(
-            new Callback<ListView<OutputFormatModel>,
-                            ListCell<OutputFormatModel>>() {
-                @Override
-                public ListCell<OutputFormatModel>
-                call(ListView<OutputFormatModel> list) {
-                    return new CellTypes.StringCell();
-                }
-            });
+            list -> new CellTypes.StringCell());
         loadGUIComponents();
     }
 
@@ -638,14 +610,7 @@ public class Controller {
                             ComboBox<OutputFormatModel> cb
                                 = (ComboBox<OutputFormatModel>) n2;
                             cb.setCellFactory(
-                                new Callback<ListView<OutputFormatModel>,
-                                                ListCell<OutputFormatModel>>() {
-                                    @Override
-                                    public ListCell<OutputFormatModel>
-                                    call(ListView<OutputFormatModel> list) {
-                                        return new CellTypes.StringCell();
-                                    }
-                                });
+                                list -> new CellTypes.StringCell());
                             cb.setOnAction(event -> {
                                 if (cb.getValue().isAvailable()) {
                                     cb.setStyle(FX_BORDER_COLOR_NULL);
@@ -714,7 +679,7 @@ public class Controller {
     /**
      * Select a service according to service url textfield.
      */
-    protected void doSelectService() {
+    private void doSelectService() {
         doSelectService(null);
     }
 
@@ -724,7 +689,7 @@ public class Controller {
      * @param downloadConf Loaded download config, null if a service is chosen
      *                     from an URL or the service List
      */
-    protected void doSelectService(DownloadConfig downloadConf) {
+    private void doSelectService(DownloadConfig downloadConf) {
         dataBean.resetSelectedService();
         serviceSelection.setDisable(true);
         serviceURL.getScene().setCursor(Cursor.WAIT);
@@ -1413,7 +1378,7 @@ public class Controller {
                         dirChooser.setInitialDirectory(dir);
                     }
                 } catch (Exception e) {
-
+                    // WTF?!
                 }
             }
             File selectedDir = dirChooser.showDialog(getPrimaryStage());
@@ -1688,14 +1653,12 @@ public class Controller {
                 }
                 setStatusTextUI(I18n.getMsg(STATUS_READY));
             });
-        return;
-
     }
 
     /**
      * Sets the Service Types.
      */
-    public void setServiceTypes() {
+    private void setServiceTypes() {
         if (dataBean.isWebServiceSet()) {
             switch (dataBean.getServiceType()) {
                 case WFS_ONE:
@@ -2073,7 +2036,7 @@ public class Controller {
     /**
      * @return the primaryStage
      */
-    public Stage getPrimaryStage() {
+    private Stage getPrimaryStage() {
         return primaryStage;
     }
 
@@ -2090,7 +2053,7 @@ public class Controller {
      *
      * @param msg the text to set.
      */
-    public void setStatusTextUI(String msg) {
+    private void setStatusTextUI(String msg) {
         String logText;
         String regexAtom = I18n.format("atom.bytes.downloaded",
             "[\\d|\\.|\\,]+");
