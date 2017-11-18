@@ -31,28 +31,53 @@ import javafx.application.Platform;
  */
 public class DownloadListener implements ProcessorListener, Runnable {
 
+    /**
+     * Message.
+     */
     private String message;
-    private Controller controller;
+    /**
+     * The main JavaFX controller.
+     */
+    private final Controller controller;
 
-    public DownloadListener(Controller controller) {
-        this.controller = controller;
+    /**
+     * Constructor.
+     * @param cnt referenced controller
+     */
+    public DownloadListener(final Controller cnt) {
+        this.controller = cnt;
     }
 
+    /**
+     * Returns sent message.
+     * @return the message
+     */
     private synchronized String getMessage() {
         return this.message;
     }
 
-    private synchronized void setMessage(String message) {
-        this.message = message;
+    /**
+     * Sets the message.
+     * @param msg the message
+     */
+    private synchronized void setMessage(final String msg) {
+        this.message = msg;
     }
 
+    /**
+     * The run method.
+     */
     @Override
     public void run() {
         controller.setStatusTextUI(getMessage());
     }
 
+    /**
+     * Received Exception.
+     * @param pe The event. pe.getException() returns the
+     */
     @Override
-    public void receivedException(ProcessorEvent pe) {
+    public void receivedException(final ProcessorEvent pe) {
         setMessage(
             I18n.format(
                 "status.error",
@@ -60,8 +85,12 @@ public class DownloadListener implements ProcessorListener, Runnable {
         Platform.runLater(this);
     }
 
+    /**
+     * Reiceived Message.
+     * @param pe The event. pe.getMessage() returns the
+     */
     @Override
-    public void receivedMessage(ProcessorEvent pe) {
+    public void receivedMessage(final ProcessorEvent pe) {
         setMessage(pe.getMessage());
         Platform.runLater(this);
     }
