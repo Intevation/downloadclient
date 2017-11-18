@@ -1466,61 +1466,62 @@ public class Controller {
     protected void handleSaveConfig(ActionEvent event) {
         extractStoredQuery();
         extractBoundingBox();
-        if (validateInput()) {
-            FileChooser fileChooser = new FileChooser();
-            DirectoryChooser dirChooser = new DirectoryChooser();
-            File downloadDir;
-            File initDir;
+        if (!validateInput()) {
+            return;
+        }
+        FileChooser fileChooser = new FileChooser();
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        File downloadDir;
+        File initDir;
 
-            dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
+        dirChooser.setTitle(I18n.getMsg("gui.save-dir"));
 
-            if (downloadConfig == null) {
-                downloadDir = dirChooser.showDialog(getPrimaryStage());
-                initDir = new File(System.getProperty(USER_DIR));
-                File uniqueName = Misc.uniqueFile(downloadDir, "config", "xml",
-                    null);
-                fileChooser.setInitialFileName(uniqueName.getName());
-            } else {
-                File downloadInitDir
-                    = new File(downloadConfig.getDownloadPath());
-                if (!downloadInitDir.exists()) {
-                    downloadInitDir = new File(System.getProperty(USER_DIR));
-                }
-                dirChooser.setInitialDirectory(downloadInitDir);
-                downloadDir = dirChooser.showDialog(getPrimaryStage());
-
-                String path = downloadConfig.getFile().getAbsolutePath();
-                path = path.substring(0, path.lastIndexOf(File.separator));
-                initDir = new File(path);
-                fileChooser.setInitialFileName(downloadConfig.getFile()
-                                                   .getName());
+        if (downloadConfig == null) {
+            downloadDir = dirChooser.showDialog(getPrimaryStage());
+            initDir = new File(System.getProperty(USER_DIR));
+            File uniqueName = Misc.uniqueFile(downloadDir, "config", "xml",
+                null);
+            fileChooser.setInitialFileName(uniqueName.getName());
+        } else {
+            File downloadInitDir
+                = new File(downloadConfig.getDownloadPath());
+            if (!downloadInitDir.exists()) {
+                downloadInitDir = new File(System.getProperty(USER_DIR));
             }
+            dirChooser.setInitialDirectory(downloadInitDir);
+            downloadDir = dirChooser.showDialog(getPrimaryStage());
 
-            fileChooser.setInitialDirectory(initDir);
-            FileChooser.ExtensionFilter xmlFilter =
-                new FileChooser.ExtensionFilter("xml files (*.xml)",
-                                                   "*.xml");
-            fileChooser.getExtensionFilters().add(xmlFilter);
-            fileChooser.setSelectedExtensionFilter(xmlFilter);
-            fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
-            File configFile = fileChooser.showSaveDialog(getPrimaryStage());
-            if (configFile == null) {
-                return;
-            }
+            String path = downloadConfig.getFile().getAbsolutePath();
+            path = path.substring(0, path.lastIndexOf(File.separator));
+            initDir = new File(path);
+            fileChooser.setInitialFileName(downloadConfig.getFile()
+                                               .getName());
+        }
 
-            if (!configFile.toString().endsWith(".xml")) {
-                configFile = new File(configFile.toString() + ".xml");
-            }
+        fileChooser.setInitialDirectory(initDir);
+        FileChooser.ExtensionFilter xmlFilter =
+            new FileChooser.ExtensionFilter("xml files (*.xml)",
+                                               "*.xml");
+        fileChooser.getExtensionFilters().add(xmlFilter);
+        fileChooser.setSelectedExtensionFilter(xmlFilter);
+        fileChooser.setTitle(I18n.getMsg("gui.save-conf"));
+        File configFile = fileChooser.showSaveDialog(getPrimaryStage());
+        if (configFile == null) {
+            return;
+        }
 
-            this.dataBean.setProcessingSteps(extractProcessingSteps());
+        if (!configFile.toString().endsWith(".xml")) {
+            configFile = new File(configFile.toString() + ".xml");
+        }
 
-            String savePath = downloadDir.getPath();
-            DownloadStep ds = dataBean.convertToDownloadStep(savePath);
-            try {
-                ds.write(configFile);
-            } catch (IOException ex) {
-                log.log(Level.WARNING, ex.getMessage(), ex);
-            }
+        this.dataBean.setProcessingSteps(extractProcessingSteps());
+
+        String savePath = downloadDir.getPath();
+        DownloadStep ds = dataBean.convertToDownloadStep(savePath);
+        try {
+            ds.write(configFile);
+        } catch (IOException ex) {
+            log.log(Level.WARNING, ex.getMessage(), ex);
         }
     }
 
@@ -1533,119 +1534,24 @@ public class Controller {
     private void chooseSelectedService(DownloadConfig downloadConf) {
         switch (dataBean.getSelectedService().getServiceType()) {
             case ATOM:
-                Platform.runLater(() ->
-                                      setStatusTextUI(
-                                          I18n.getMsg("status.type.atom"))
-                );
-                Atom atom = null;
-                try {
-                    atom = new Atom(dataBean
-                                        .getSelectedService()
-                                        .getServiceURL().toString(),
-                                       dataBean
-                                           .getSelectedService()
-                                           .getUsername(),
-                                       dataBean
-                                           .getSelectedService()
-                                           .getPassword());
-                } catch (IllegalArgumentException
-                             | URISyntaxException
-                             | ParserConfigurationException
-                             | IOException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
-                    Platform.runLater(
-                        () ->
-                            setStatusTextUI(
-                                I18n.getMsg(STATUS_SERVICE_BROKEN)
-                            )
-                    );
-                    resetGui();
+                if (!isAtomChosenSuccessfully()) {
                     return;
-                } finally {
-                    dataBean.setAtomService(atom);
                 }
                 break;
             case WFS_ONE:
-                Platform.runLater(
-                    () ->
-                        setStatusTextUI(
-                            I18n.getMsg("status.type.wfsone"))
-                );
-                WFSMetaExtractor wfsOne =
-                    new WFSMetaExtractor(dataBean
-                                             .getSelectedService()
-                                             .getServiceURL()
-                                             .toString(),
-                                            dataBean
-                                                .getSelectedService()
-                                                .getUsername(),
-                                            dataBean
-                                                .getSelectedService()
-                                                .getPassword());
-                WFSMeta metaOne = null;
-                try {
-                    metaOne = wfsOne.parse();
-                } catch (IOException
-                             | URISyntaxException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
-                    Platform.runLater(
-                        () ->
-                            setStatusTextUI(
-                                I18n.getMsg(STATUS_SERVICE_BROKEN)
-                            )
-                    );
-                } finally {
-                    dataBean.setWFSService(metaOne);
-                }
+                chooseWFSOne();
                 break;
             case WFS_TWO:
-                Platform.runLater(
-                    () ->
-                        setStatusTextUI(
-                            I18n.getMsg("status.type.wfstwo"))
-                );
-                WFSMetaExtractor extractor =
-                    new WFSMetaExtractor(dataBean
-                                             .getSelectedService()
-                                             .getServiceURL()
-                                             .toString(),
-                                            dataBean
-                                                .getSelectedService()
-                                                .getUsername(),
-                                            dataBean
-                                                .getSelectedService()
-                                                .getPassword());
-                WFSMeta meta = null;
-                try {
-                    meta = extractor.parse();
-                } catch (IOException
-                             | URISyntaxException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
-                    Platform.runLater(
-                        () ->
-                            setStatusTextUI(
-                                I18n.getMsg(STATUS_SERVICE_BROKEN))
-                    );
-
-                } finally {
-                    dataBean.setWFSService(meta);
-                }
+                chooseWFS2();
                 break;
             default:
-                log.log(Level.WARNING,
-                    "Could not determine URL",
-                    dataBean.getSelectedService());
-                Platform.runLater(
-                    () ->
-                        setStatusTextUI(I18n.getMsg("status.no-url"))
-                );
+                showError();
                 break;
         }
-        if (dataBean.isWebServiceSet()) {
-            Platform.runLater(this::setServiceTypes);
-        } else {
+        if (!dataBean.isWebServiceSet()) {
             return;
         }
+        Platform.runLater(this::setServiceTypes);
         Platform.runLater(
             () -> {
                 serviceTypeChooser
@@ -1657,92 +1563,211 @@ public class Controller {
             });
     }
 
+    private void showError() {
+        log.log(Level.WARNING,
+            "Could not determine URL",
+            dataBean.getSelectedService());
+        Platform.runLater(() -> setStatusTextUI(I18n.getMsg("status.no-url")));
+    }
+
+    private void chooseWFS2() {
+        Platform.runLater(
+            () ->
+                setStatusTextUI(
+                    I18n.getMsg("status.type.wfstwo"))
+        );
+        WFSMetaExtractor extractor =
+            new WFSMetaExtractor(dataBean
+                                     .getSelectedService()
+                                     .getServiceURL()
+                                     .toString(),
+                                    dataBean
+                                        .getSelectedService()
+                                        .getUsername(),
+                                    dataBean
+                                        .getSelectedService()
+                                        .getPassword());
+        WFSMeta meta = null;
+        try {
+            meta = extractor.parse();
+        } catch (IOException
+                     | URISyntaxException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            Platform.runLater(
+                () ->
+                    setStatusTextUI(
+                        I18n.getMsg(STATUS_SERVICE_BROKEN))
+            );
+
+        } finally {
+            dataBean.setWFSService(meta);
+        }
+    }
+
+    private void chooseWFSOne() {
+        Platform.runLater(
+            () ->
+                setStatusTextUI(
+                    I18n.getMsg("status.type.wfsone"))
+        );
+        WFSMetaExtractor wfsOne =
+            new WFSMetaExtractor(dataBean
+                                     .getSelectedService()
+                                     .getServiceURL()
+                                     .toString(),
+                                    dataBean
+                                        .getSelectedService()
+                                        .getUsername(),
+                                    dataBean
+                                        .getSelectedService()
+                                        .getPassword());
+        WFSMeta metaOne = null;
+        try {
+            metaOne = wfsOne.parse();
+        } catch (IOException
+                     | URISyntaxException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            Platform.runLater(
+                () ->
+                    setStatusTextUI(
+                        I18n.getMsg(STATUS_SERVICE_BROKEN)
+                    )
+            );
+        } finally {
+            dataBean.setWFSService(metaOne);
+        }
+    }
+
+    private boolean isAtomChosenSuccessfully() {
+        Platform.runLater(() ->
+                              setStatusTextUI(
+                                  I18n.getMsg("status.type.atom"))
+        );
+        Atom atom = null;
+        try {
+            atom = new Atom(dataBean
+                                .getSelectedService()
+                                .getServiceURL().toString(),
+                               dataBean
+                                   .getSelectedService()
+                                   .getUsername(),
+                               dataBean
+                                   .getSelectedService()
+                                   .getPassword());
+        } catch (IllegalArgumentException
+                     | URISyntaxException
+                     | ParserConfigurationException
+                     | IOException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            Platform.runLater(
+                () ->
+                    setStatusTextUI(
+                        I18n.getMsg(STATUS_SERVICE_BROKEN)
+                    )
+            );
+            resetGui();
+            return false;
+        } finally {
+            dataBean.setAtomService(atom);
+        }
+        return true;
+    }
+
     /**
      * Sets the Service Types.
      */
     private void setServiceTypes() {
-        if (dataBean.isWebServiceSet()) {
-            switch (dataBean.getServiceType()) {
-                case WFS_ONE:
-                case WFS_TWO:
-                    ReferencedEnvelope extendWFS = null;
-                    List<WFSMeta.Feature> features =
-                        dataBean.getWFSService().getFeatures();
-                    List<WFSMeta.StoredQuery> queries =
-                        dataBean.getWFSService().getStoredQueries();
-                    ObservableList<ItemModel> types =
-                        FXCollections.observableArrayList();
-                    if (!dataBean.getWFSService().isSimple()) {
-                        for (WFSMeta.Feature f : features) {
-                            types.add(new FeatureModel(f));
-                            if (f.getBBox() != null) {
-                                if (extendWFS == null) {
-                                    extendWFS = f.getBBox();
-                                } else {
-                                    extendWFS.expandToInclude(f.getBBox());
-                                }
-                            }
-                        }
+        if (!dataBean.isWebServiceSet()) {
+            return;
+        }
+        switch (dataBean.getServiceType()) {
+            case WFS_ONE:
+            case WFS_TWO:
+                setWFSType();
+                break;
+            case ATOM:
+                setAtomType();
+                break;
+            default:
+        }
+    }
+
+    private void setAtomType() {
+        List<Atom.Item> items =
+            dataBean.getAtomService().getItems();
+        ObservableList<ItemModel> opts =
+            FXCollections.observableArrayList();
+        List<WMSMapSwing.FeaturePolygon> polygonList
+            = new ArrayList<>();
+        //Polygons are always epsg:4326
+        // (http://www.georss.org/gml.html)
+        try {
+            ReferencedEnvelope extendATOM = null;
+            CoordinateReferenceSystem
+                atomCRS = CRS.decode(ATOM_CRS_STRING);
+            Geometry all = null;
+            for (Atom.Item i : items) {
+                opts.add(new AtomItemModel(i));
+                WMSMapSwing.FeaturePolygon polygon =
+                    getPolygon(atomCRS, i);
+                polygonList.add(polygon);
+                all = all == null
+                          ? i.getPolygon()
+                          : all.union(i.getPolygon());
+            }
+            if (mapAtom != null) {
+                if (all != null) {
+                    extendATOM = getEnvelope(atomCRS,
+                        all);
+                    mapAtom.setExtend(extendATOM);
+                }
+                mapAtom.drawPolygons(polygonList);
+            }
+        } catch (FactoryException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        serviceTypeChooser.getItems().retainAll();
+        serviceTypeChooser.setItems(opts);
+        if (!opts.isEmpty()) {
+            serviceTypeChooser.setValue(opts.get(0));
+            chooseType(serviceTypeChooser.getValue());
+        }
+        Platform.runLater(
+            () ->
+                mapAtom.repaint()
+        );
+    }
+
+    private void setWFSType() {
+        ReferencedEnvelope extendWFS = null;
+        List<WFSMeta.Feature> features =
+            dataBean.getWFSService().getFeatures();
+        List<WFSMeta.StoredQuery> queries =
+            dataBean.getWFSService().getStoredQueries();
+        ObservableList<ItemModel> types =
+            FXCollections.observableArrayList();
+        if (!dataBean.getWFSService().isSimple()) {
+            for (WFSMeta.Feature f : features) {
+                types.add(new FeatureModel(f));
+                if (f.getBBox() != null) {
+                    if (extendWFS == null) {
+                        extendWFS = f.getBBox();
+                    } else {
+                        extendWFS.expandToInclude(f.getBBox());
                     }
-                    if (extendWFS != null) {
-                        mapWFS.setExtend(extendWFS);
-                    }
-                    for (WFSMeta.StoredQuery s : queries) {
-                        types.add(new StoredQueryModel(s));
-                    }
-                    serviceTypeChooser.getItems().retainAll();
-                    serviceTypeChooser.setItems(types);
-                    serviceTypeChooser.setValue(types.get(0));
-                    chooseType(serviceTypeChooser.getValue());
-                    break;
-                case ATOM:
-                    List<Atom.Item> items =
-                        dataBean.getAtomService().getItems();
-                    ObservableList<ItemModel> opts =
-                        FXCollections.observableArrayList();
-                    List<WMSMapSwing.FeaturePolygon> polygonList
-                        = new ArrayList<>();
-                    //Polygons are always epsg:4326
-                    // (http://www.georss.org/gml.html)
-                    try {
-                        ReferencedEnvelope extendATOM = null;
-                        CoordinateReferenceSystem
-                            atomCRS = CRS.decode(ATOM_CRS_STRING);
-                        Geometry all = null;
-                        for (Atom.Item i : items) {
-                            opts.add(new AtomItemModel(i));
-                            WMSMapSwing.FeaturePolygon polygon =
-                                getPolygon(atomCRS, i);
-                            polygonList.add(polygon);
-                            all = all == null
-                                      ? i.getPolygon()
-                                      : all.union(i.getPolygon());
-                        }
-                        if (mapAtom != null) {
-                            if (all != null) {
-                                extendATOM = getEnvelope(atomCRS,
-                                    all);
-                                mapAtom.setExtend(extendATOM);
-                            }
-                            mapAtom.drawPolygons(polygonList);
-                        }
-                    } catch (FactoryException e) {
-                        log.log(Level.SEVERE, e.getMessage(), e);
-                    }
-                    serviceTypeChooser.getItems().retainAll();
-                    serviceTypeChooser.setItems(opts);
-                    if (!opts.isEmpty()) {
-                        serviceTypeChooser.setValue(opts.get(0));
-                        chooseType(serviceTypeChooser.getValue());
-                    }
-                    Platform.runLater(
-                        () ->
-                            mapAtom.repaint()
-                    );
-                    break;
-                default:
+                }
             }
         }
+        if (extendWFS != null) {
+            mapWFS.setExtend(extendWFS);
+        }
+        for (WFSMeta.StoredQuery s : queries) {
+            types.add(new StoredQueryModel(s));
+        }
+        serviceTypeChooser.getItems().retainAll();
+        serviceTypeChooser.setItems(types);
+        serviceTypeChooser.setValue(types.get(0));
+        chooseType(serviceTypeChooser.getValue());
     }
 
     private ReferencedEnvelope getEnvelope(CoordinateReferenceSystem a,
@@ -1949,6 +1974,7 @@ public class Controller {
 
     /**
      * Choose the type.
+     *
      * @param data data
      */
     public void chooseType(ItemModel data) {
