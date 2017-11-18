@@ -30,13 +30,12 @@ import de.bayern.gdi.processor.ConverterException;
 import de.bayern.gdi.processor.DownloadStepConverter;
 import de.bayern.gdi.processor.JobList;
 import de.bayern.gdi.processor.Processor;
-import de.bayern.gdi.processor.ProcessorEvent;
-import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.services.Atom;
 import de.bayern.gdi.services.Service;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
+import de.bayern.gdi.utils.DownloadListener;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Logging.AppLog;
 import de.bayern.gdi.utils.Misc;
@@ -280,7 +279,7 @@ public class Controller {
      */
     public Controller() {
         this.factory = new UIFactory();
-        Processor.getInstance().addListener(new DownloadListener());
+        Processor.getInstance().addListener(new DownloadListener(this));
     }
 
     private static void initAppLog() {
@@ -2053,7 +2052,7 @@ public class Controller {
      *
      * @param msg the text to set.
      */
-    private void setStatusTextUI(String msg) {
+    public void setStatusTextUI(String msg) {
         String logText;
         String regexAtom = I18n.format("atom.bytes.downloaded",
             "[\\d|\\.|\\,]+");
@@ -2226,42 +2225,6 @@ public class Controller {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Keeps track of download progression and errors.
-     */
-    private class DownloadListener implements ProcessorListener, Runnable {
-
-        private String message;
-
-        private synchronized String getMessage() {
-            return this.message;
-        }
-
-        private synchronized void setMessage(String message) {
-            this.message = message;
-        }
-
-        @Override
-        public void run() {
-            setStatusTextUI(getMessage());
-        }
-
-        @Override
-        public void receivedException(ProcessorEvent pe) {
-            setMessage(
-                I18n.format(
-                    "status.error",
-                    pe.getException().getMessage()));
-            Platform.runLater(this);
-        }
-
-        @Override
-        public void receivedMessage(ProcessorEvent pe) {
-            setMessage(pe.getMessage());
-            Platform.runLater(this);
         }
     }
 }
