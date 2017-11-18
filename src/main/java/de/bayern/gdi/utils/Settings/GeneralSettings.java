@@ -16,8 +16,11 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.utils;
+package de.bayern.gdi.utils.Settings;
 
+import de.bayern.gdi.utils.Misc;
+import de.bayern.gdi.utils.Service.ServiceSettings;
+import de.bayern.gdi.utils.XML;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.File;
@@ -30,20 +33,20 @@ import org.xml.sax.SAXException;
  * @author Alexander Woestmann (awoestmann@intevation)
  */
 
-public class Settings {
+public class GeneralSettings {
 
     /** Name of the config file. */
     public static final String SETTINGS_FILE =
             "settings.xml";
 
     private static final String NAME =
-            "Settings";
+            "GeneralSettings";
 
     private ServiceSettings serviceSettings;
 
     private ApplicationSettings applicationSettings;
 
-    public Settings()
+    public GeneralSettings()
             throws SAXException, ParserConfigurationException, IOException {
         this(SETTINGS_FILE);
     }
@@ -52,17 +55,17 @@ public class Settings {
      * Constructor.
      * @param filePath Path to the settings xml document
      */
-    public Settings(String filePath)
+    public GeneralSettings(String filePath)
         throws SAXException, ParserConfigurationException, IOException {
         this(XML.getDocument(getFileStream(filePath)));
     }
 
-    public Settings(File file)
+    public GeneralSettings(File file)
         throws SAXException, ParserConfigurationException, IOException {
         this(XML.getDocument(file));
     }
 
-    public Settings(Document doc) throws IOException {
+    public GeneralSettings(Document doc) throws IOException {
         this.serviceSettings = new ServiceSettings(doc);
         this.applicationSettings = new ApplicationSettings(doc);
     }

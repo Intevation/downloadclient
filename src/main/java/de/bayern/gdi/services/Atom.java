@@ -27,7 +27,7 @@ import com.vividsolutions.jts.io.WKTReader;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.NamespaceContextMap;
-import de.bayern.gdi.utils.ServiceChecker;
+import de.bayern.gdi.utils.Service.ServiceChecker;
 import de.bayern.gdi.utils.XML;
 
 import java.io.IOException;

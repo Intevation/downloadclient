@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.utils;
+package de.bayern.gdi.utils.Logging;
 
+import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.Unauthorized;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

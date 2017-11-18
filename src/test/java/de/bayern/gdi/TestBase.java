@@ -22,7 +22,7 @@ import de.bayern.gdi.gui.Controller;
 import de.bayern.gdi.gui.DataBean;
 import de.bayern.gdi.gui.Start;
 import de.bayern.gdi.gui.WarningPopup;
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.utils.Settings.Config;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
 import de.bayern.gdi.utils.I18n;

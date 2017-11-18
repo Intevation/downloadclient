@@ -31,7 +31,7 @@ import de.bayern.gdi.processor.Processor;
 import de.bayern.gdi.processor.ProcessorEvent;
 import de.bayern.gdi.processor.ProcessorListener;
 import de.bayern.gdi.utils.Unauthorized;
-import de.bayern.gdi.utils.UnauthorizedLog;
+import de.bayern.gdi.utils.Logging.UnauthorizedLog;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.FileResponseHandler;
 

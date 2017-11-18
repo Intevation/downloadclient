@@ -19,7 +19,7 @@ package de.bayern.gdi.processor;
 
 import java.io.IOException;
 
-import de.bayern.gdi.utils.Log;
+import de.bayern.gdi.utils.Logging.Log;
 import de.bayern.gdi.utils.I18n;
 
 /**

@@ -37,12 +37,13 @@ import de.bayern.gdi.services.Service;
 import de.bayern.gdi.services.ServiceType;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
-import de.bayern.gdi.utils.Config;
-import de.bayern.gdi.utils.DownloadConfig;
+import de.bayern.gdi.utils.Logging.AppLogFormatter;
+import de.bayern.gdi.utils.Settings.Config;
+import de.bayern.gdi.utils.Settings.DownloadConfig;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Misc;
-import de.bayern.gdi.utils.ServiceChecker;
-import de.bayern.gdi.utils.ServiceSettings;
+import de.bayern.gdi.utils.Service.ServiceChecker;
+import de.bayern.gdi.utils.Service.ServiceSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,11 +52,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,8 +62,6 @@ import java.util.Set;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.LogRecord;
-import java.util.logging.Formatter;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
@@ -373,9 +367,9 @@ public class Controller {
     @FXML
     private void handleAboutAction(final ActionEvent event) {
         try {
-            String path = "about/about_"
-                + Locale.getDefault().getLanguage()
-                + ".html";
+            String path = String.format(
+                "about/about_%s.html", Locale.getDefault().getLanguage()
+            );
             displayHTMLFileAsPopup(I18n.getMsg("menu.about"), path);
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
@@ -400,11 +394,13 @@ public class Controller {
 
     @FXML
     private void handleHelpAction(final ActionEvent event) {
-        String pathToFile = "help/help_"
-            + Locale.getDefault().getLanguage()
-            + ".txt";
+        String pathToFile = String.format(
+            "help/help_%s.txt", Locale.getDefault().getLanguage()
+        );
         try {
             openLinkFromFile(pathToFile);
+        } catch (MalformedURLException e) {
+            // Do not log application is sane
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -816,7 +812,6 @@ public class Controller {
             } catch (MalformedURLException e) {
                 setStatusTextUI(
                         I18n.format("status.no-url"));
-                log.log(Level.SEVERE, e.getMessage(), e);
                 serviceSelection.setDisable(false);
                 serviceURL.getScene()
                         .setCursor(Cursor.DEFAULT);
@@ -1831,7 +1826,7 @@ public class Controller {
     private void chooseWFSType(ItemModel data, boolean datasetAvailable) {
         if (data instanceof FeatureModel
             || (!datasetAvailable
-            && downloadConfig.getServiceType() == "WFS2_BASIC")) {
+            && downloadConfig.getServiceType().equals("WFS2_BASIC"))) {
             this.simpleWFSContainer.setVisible(false);
             this.basicWFSContainer.setVisible(true);
             this.mapNodeWFS.setVisible(true);
@@ -2261,28 +2256,6 @@ public class Controller {
         public void receivedMessage(ProcessorEvent pe) {
             setMessage(pe.getMessage());
             Platform.runLater(this);
-        }
-    }
-
-    /**
-     * Application log formatting.
-     */
-    private static class AppLogFormatter extends Formatter {
-        /**
-         * Formats log record.
-         *
-         * @return Formatted log entry
-         */
-        @Override
-        public String format(LogRecord record) {
-            LocalDateTime time = Instant.ofEpochMilli(record.getMillis())
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDateTime();
-            return time.format(DateTimeFormatter
-                            .ofPattern("E, dd.MM.yyyy - kk:mm:ss"))
-                            + " "
-                            + record.getMessage()
-                            + System.lineSeparator();
         }
     }
 }

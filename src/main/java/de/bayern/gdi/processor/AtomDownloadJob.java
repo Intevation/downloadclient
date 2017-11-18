@@ -32,11 +32,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.utils.Settings.Config;
 import de.bayern.gdi.utils.DocumentResponseHandler;
 import de.bayern.gdi.utils.HTTP;
 import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.Log;
+import de.bayern.gdi.utils.Logging.Log;
 import de.bayern.gdi.utils.NamespaceContextMap;
 import de.bayern.gdi.utils.StringUtils;
 import de.bayern.gdi.utils.XML;

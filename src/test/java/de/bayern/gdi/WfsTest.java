@@ -20,7 +20,7 @@ package de.bayern.gdi;
 import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMeta.Feature;
 import de.bayern.gdi.services.WFSMetaExtractor;
-import de.bayern.gdi.utils.Config;
+import de.bayern.gdi.utils.Settings.Config;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;

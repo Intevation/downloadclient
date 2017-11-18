@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-package de.bayern.gdi.utils;
+package de.bayern.gdi.utils.Service;
 
 import de.bayern.gdi.services.ServiceType;
+import de.bayern.gdi.utils.HTTP;
+import de.bayern.gdi.utils.XML;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;

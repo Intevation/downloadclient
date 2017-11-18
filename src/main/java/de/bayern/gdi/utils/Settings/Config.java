@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.bayern.gdi.utils;
+package de.bayern.gdi.utils.Settings;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import de.bayern.gdi.model.MIMETypes;
 import de.bayern.gdi.model.ProcessingConfiguration;
 import de.bayern.gdi.model.ProxyConfiguration;
+import de.bayern.gdi.utils.Service.ServiceSettings;
 
 import org.xml.sax.SAXException;
 
@@ -48,7 +49,7 @@ public class Config {
 
     private boolean initialized;
 
-    private Settings settings;
+    private GeneralSettings generalSettings;
 
     private MIMETypes mimeTypes;
 
@@ -77,17 +78,17 @@ public class Config {
     }
 
     /**
-     * @return The application Settings
+     * @return The application GeneralSettings
      */
     public ApplicationSettings getApplicationSettings() {
-        return settings.getApplicationSettings();
+        return generalSettings.getApplicationSettings();
     }
 
     /**
      * @return the services
      */
     public ServiceSettings getServices() {
-        return settings.getServiceSettings();
+        return generalSettings.getServiceSettings();
     }
 
     /**
@@ -111,18 +112,18 @@ public class Config {
         return proxyConfig;
     }
 
-    private static Settings loadSettings(File file)
+    private static GeneralSettings loadSettings(File file)
         throws IOException {
         try {
             if (file != null && file.isFile() && file.canRead()) {
-                return new Settings(file);
+                return new GeneralSettings(file);
             }
-            return new Settings();
+            return new GeneralSettings();
         } catch (SAXException
                 | ParserConfigurationException
                 | IOException e) {
             log.log(Level.SEVERE, e.getMessage(), Holder.INSTANCE);
-            throwConfigFailureException(Settings.getName());
+            throwConfigFailureException(GeneralSettings.getName());
         }
         // Not reached.
         return null;
@@ -137,7 +138,7 @@ public class Config {
         synchronized (Holder.INSTANCE) {
             log.info("No config directory given, starting with standard "
                     + "values...");
-            Holder.INSTANCE.settings = loadSettings(null);
+            Holder.INSTANCE.generalSettings = loadSettings(null);
             Holder.INSTANCE.processingConfig =
                 ProcessingConfiguration.loadDefault();
             Holder.INSTANCE.mimeTypes = MIMETypes.loadDefault();
@@ -183,12 +184,12 @@ public class Config {
             log.info("No Proxy config found, starting without proxy.");
         }
 
-        File services = new File(dir, Settings.SETTINGS_FILE);
+        File services = new File(dir, GeneralSettings.SETTINGS_FILE);
         if (services.isFile() && services.canRead()) {
-            Holder.INSTANCE.settings = loadSettings(services);
+            Holder.INSTANCE.generalSettings = loadSettings(services);
         } else {
-            Holder.INSTANCE.settings = loadSettings(null);
-            log.info("Settings config not found, using fallback...");
+            Holder.INSTANCE.generalSettings = loadSettings(null);
+            log.info("GeneralSettings config not found, using fallback...");
         }
 
         File procConfig = new File(
