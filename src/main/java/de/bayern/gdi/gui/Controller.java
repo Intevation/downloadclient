@@ -39,6 +39,7 @@ import de.bayern.gdi.utils.DownloadListener;
 import de.bayern.gdi.utils.I18n;
 import de.bayern.gdi.utils.Logging.AppLog;
 import de.bayern.gdi.utils.Misc;
+import de.bayern.gdi.utils.SelectedAtomPolygon;
 import de.bayern.gdi.utils.Service.ServiceChecker;
 import de.bayern.gdi.utils.Service.ServiceSettings;
 import de.bayern.gdi.utils.Settings.Config;
@@ -50,8 +51,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -142,16 +141,22 @@ public class Controller {
     //Application log
     private static final Logger APP_LOG = Logger.getLogger("Application Log");
     private static boolean appLogInit = false;
-
+    /**
+     * MapAtom component.
+     */
+    public WMSMapSwing mapAtom;
+    /**
+     * ServiceTypeChooser.
+     */
+    @FXML
+    public ComboBox<ItemModel> serviceTypeChooser;
     // DataBean
     private DataBean dataBean;
     private Stage primaryStage;
     private UIFactory factory;
     private boolean catalogReachable;
-    private WMSMapSwing mapAtom;
     private WMSMapSwing mapWFS;
     private DownloadConfig downloadConfig;
-
     @FXML
     private Button buttonClose;
     @FXML
@@ -178,8 +183,6 @@ public class Controller {
     private TitledPane logHistoryParent;
     @FXML
     private ScrollPane logHistoryPanel;
-    @FXML
-    private ComboBox<ItemModel> serviceTypeChooser;
     @FXML
     private ComboBox<ItemModel> atomVariationChooser;
     @FXML
@@ -1944,7 +1947,11 @@ public class Controller {
         }
     }
 
-    private void chooseType(ItemModel data) {
+    /**
+     * Choose the type.
+     * @param data data
+     */
+    public void chooseType(ItemModel data) {
         ServiceType type = this.dataBean.getServiceType();
         boolean datasetAvailable = false;
         if (data instanceof MiscItemModel) {
@@ -2007,7 +2014,7 @@ public class Controller {
                                          serviceSetting.getWMSLayer(),
                                          serviceSetting.getWMSSource());
             mapAtom.addEventHandler(PolygonClickedEvent.ANY,
-                new SelectedAtomPolygon());
+                new SelectedAtomPolygon(this));
             mapAtom.setCoordinateDisplay(atomX1,
                 atomY1,
                 atomX2,
@@ -2178,53 +2185,6 @@ public class Controller {
         //If all chain items were ready, set status to ready
         if (allValid) {
             setStatusTextUI(I18n.format(STATUS_READY));
-        }
-    }
-
-    /**
-     * Handels the Action, when a polygon is selected.
-     */
-    public class SelectedAtomPolygon implements
-        EventHandler<Event> {
-        @Override
-        public void handle(Event event) {
-            if (mapAtom != null && event instanceof PolygonClickedEvent) {
-
-                PolygonClickedEvent pce = (PolygonClickedEvent) event;
-                WMSMapSwing.PolygonInfos polygonInfos =
-                    pce.getPolygonInfos();
-                String polygonName = polygonInfos.getName();
-                String polygonID = polygonInfos.getID();
-
-                if (polygonName != null && polygonID != null) {
-                    if (polygonName.equals("#@#")) {
-                        setStatusTextUI(I18n.format(
-                            "status.polygon-intersect",
-                            polygonID));
-                        return;
-                    }
-
-                    ObservableList<ItemModel> items =
-                        serviceTypeChooser.getItems();
-                    int i = 0;
-                    for (i = 0; i < items.size(); i++) {
-                        AtomItemModel item = (AtomItemModel) items.get(i);
-                        Atom.Item aitem = (Atom.Item) item.getItem();
-                        if (aitem.getID().equals(polygonID)) {
-                            break;
-                        }
-                    }
-                    Atom.Item oldItem =
-                        (Atom.Item) serviceTypeChooser
-                                        .getSelectionModel()
-                                        .getSelectedItem().getItem();
-                    if (i < items.size()
-                            && !oldItem.getID().equals(polygonID)) {
-                        serviceTypeChooser.setValue(items.get(i));
-                        chooseType(serviceTypeChooser.getValue());
-                    }
-                }
-            }
         }
     }
 }
