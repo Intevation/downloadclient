@@ -102,7 +102,7 @@ public class SelectedAtomPolygon implements
      * @return true or false
      */
     private boolean isPolygonClicked(final Event event) {
-        return controller.mapAtom != null
+        return controller.isMapAtomSet()
                    && event instanceof PolygonClickedEvent;
     }
 }

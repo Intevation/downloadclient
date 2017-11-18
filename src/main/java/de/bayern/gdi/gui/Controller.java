@@ -37,9 +37,9 @@ import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.DownloadListener;
 import de.bayern.gdi.utils.I18n;
-import de.bayern.gdi.utils.logging.AppLog;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.SelectedAtomPolygon;
+import de.bayern.gdi.utils.logging.AppLog;
 import de.bayern.gdi.utils.service.ServiceChecker;
 import de.bayern.gdi.utils.service.ServiceSettings;
 import de.bayern.gdi.utils.settings.Config;
@@ -142,14 +142,11 @@ public class Controller {
     private static final Logger APP_LOG = Logger.getLogger("Application Log");
     private static boolean appLogInit = false;
     /**
-     * MapAtom component.
-     */
-    public WMSMapSwing mapAtom;
-    /**
      * ServiceTypeChooser.
      */
     @FXML
     public ComboBox<ItemModel> serviceTypeChooser;
+    private WMSMapSwing mapAtom;
     // DataBean
     private DataBean dataBean;
     private Stage primaryStage;
@@ -269,14 +266,12 @@ public class Controller {
     private VBox basicWFSX2Y2;
     @FXML
     private Label referenceSystemChooserLabel;
-
     @FXML
     private MenuItem menuHelp;
     @FXML
     private MenuItem menuAbout;
     @FXML
     private MenuBar menuBar;
-
     /**
      * Creates the Controller.
      */
@@ -317,6 +312,15 @@ public class Controller {
             }
             APP_LOG.info(msg);
         }
+    }
+
+    /**
+     * Shows whether the MapAtom is set.
+     *
+     * @return if so true else false
+     */
+    public boolean isMapAtomSet() {
+        return mapAtom != null;
     }
 
     /**
