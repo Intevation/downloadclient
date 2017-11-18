@@ -97,6 +97,7 @@ import java.util.function.Consumer;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
 import org.geotools.geometry.Envelope2D;
@@ -272,6 +273,7 @@ public class Controller {
     private MenuItem menuAbout;
     @FXML
     private MenuBar menuBar;
+
     /**
      * Creates the Controller.
      */
@@ -491,6 +493,7 @@ public class Controller {
 
     /**
      * Loads the DownloadConfig.
+     *
      * @param conf the config
      */
     private void loadDownloadConfig(DownloadConfig conf) {
@@ -1885,127 +1888,145 @@ public class Controller {
     }
 
     private void chooseWFSType(ItemModel data, boolean datasetAvailable) {
-        if (data instanceof FeatureModel
-                || (!datasetAvailable
-                        && downloadConfig
-                               .getServiceType()
-                               .equals("WFS2_BASIC"))) {
-            this.simpleWFSContainer.setVisible(false);
-            this.basicWFSContainer.setVisible(true);
-            this.mapNodeWFS.setVisible(true);
-            this.atomContainer.setVisible(false);
-            this.basicWFSX1Y1.setVisible(true);
-            this.basicWFSX2Y2.setVisible(true);
-            this.referenceSystemChooser.setVisible(true);
-            this.referenceSystemChooserLabel.setVisible(true);
-            WFSMeta.Feature feature;
-            if (datasetAvailable) {
-                feature = (WFSMeta.Feature) data.getItem();
-            } else {
-                feature = new WFSMeta.Feature();
-            }
-            mapWFS.setExtend(feature.getBBox());
-            ArrayList<String> list = new ArrayList<>();
-            list.add(feature.getDefaultCRS());
-            list.addAll(feature.getOtherCRSs());
-            ObservableList<CRSModel> crsList =
-                FXCollections.observableArrayList();
-            for (String crsStr : list) {
-                try {
-                    String newcrsStr = crsStr;
-                    String seperator = null;
-                    if (newcrsStr.contains("::")) {
-                        seperator = "::";
-                    } else if (newcrsStr.contains("/")) {
-                        seperator = "/";
-                    }
-                    if (seperator != null) {
-                        newcrsStr = "EPSG:"
-                                        + newcrsStr.substring(
-                            newcrsStr.lastIndexOf(seperator)
-                                + seperator.length(),
-                            newcrsStr.length());
-                    }
-                    CoordinateReferenceSystem crs = CRS.decode(newcrsStr);
-                    CRSModel crsm = new CRSModel(crs);
-                    crsm.setOldName(crsStr);
-                    crsList.add(crsm);
-                } catch (FactoryException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
-                }
-            }
-            if (!crsList.isEmpty()) {
-                this.referenceSystemChooser.setItems(crsList);
-                CRSModel crsm = crsList.get(0);
-                try {
-                    CoordinateReferenceSystem initCRS = CRS.decode(
-                        INITIAL_CRS_DISPLAY);
-                    CRSModel initCRSM = new CRSModel(initCRS);
-                    for (int i = 0; i < crsList.size(); i++) {
-                        if (crsList.get(i).equals(initCRSM)) {
-                            crsm = crsList.get(i);
-                            break;
-                        }
-                    }
-                } catch (FactoryException e) {
-                    log.log(Level.SEVERE, e.getMessage(), e);
-                }
-                this.referenceSystemChooser.setValue(crsm);
-            }
-            List<String> outputFormats = this.dataBean
-                                             .getWFSService()
-                                             .findOperation("GetFeature")
-                                             .getOutputFormats();
-
-            if (outputFormats.isEmpty()) {
-                outputFormats =
-                    this.dataBean.getWFSService().getOutputFormats();
-            }
-            List<OutputFormatModel> formatModels = new ArrayList<>();
-            for (String s : outputFormats) {
-                OutputFormatModel m = new OutputFormatModel();
-                m.setItem(s);
-                m.setAvailable(true);
-                formatModels.add(m);
-            }
-            ObservableList<OutputFormatModel> formats =
-                FXCollections.observableArrayList(formatModels);
-            this.dataFormatChooser.setItems(formats);
-        } else if (data instanceof StoredQueryModel
-                       || (!datasetAvailable
-                               && downloadConfig
-                                      .getServiceType()
-                                      .equals("WFS2_SIMPLE"))) {
-            List<String> outputFormats = this.dataBean
-                                             .getWFSService()
-                                             .findOperation("GetFeature")
-                                             .getOutputFormats();
-            if (outputFormats.isEmpty()) {
-                outputFormats =
-                    this.dataBean.getWFSService().getOutputFormats();
-            }
-            List<OutputFormatModel> formatModels =
-                new ArrayList<>();
-            for (String i : outputFormats) {
-                OutputFormatModel m = new OutputFormatModel();
-                m.setItem(i);
-                m.setAvailable(true);
-                formatModels.add(m);
-            }
-            WFSMeta.StoredQuery storedQuery;
-            if (datasetAvailable) {
-                storedQuery = (WFSMeta.StoredQuery) data.getItem();
-            } else {
-                storedQuery = new WFSMeta.StoredQuery();
-            }
-            factory.fillSimpleWFS(
-                this.simpleWFSContainer,
-                storedQuery,
-                formatModels);
-            this.atomContainer.setVisible(false);
-            this.simpleWFSContainer.setVisible(true);
-            this.basicWFSContainer.setVisible(false);
+        if (isWfs2basic(data, datasetAvailable)) {
+            chooseWFS2Basic(data, datasetAvailable);
+        } else if (isWfs2simple(data, datasetAvailable)) {
+            chooseWFS2Simple(data, datasetAvailable);
         }
+    }
+
+    private void chooseWFS2Simple(ItemModel data, boolean datasetAvailable) {
+        List<String> outputFormats = getGetFeature();
+        if (outputFormats.isEmpty()) {
+            outputFormats =
+                this.dataBean.getWFSService().getOutputFormats();
+        }
+        List<OutputFormatModel> formatModels =
+            outputFormats.stream().map(
+                f -> {
+                    OutputFormatModel m = new OutputFormatModel();
+                    m.setItem(f);
+                    m.setAvailable(true);
+                    return m;
+                }
+            ).collect(Collectors.toList());
+        WFSMeta.StoredQuery storedQuery;
+        if (datasetAvailable) {
+            storedQuery = (WFSMeta.StoredQuery) data.getItem();
+        } else {
+            storedQuery = new WFSMeta.StoredQuery();
+        }
+        factory.fillSimpleWFS(
+            this.simpleWFSContainer,
+            storedQuery,
+            formatModels);
+        this.atomContainer.setVisible(false);
+        this.simpleWFSContainer.setVisible(true);
+        this.basicWFSContainer.setVisible(false);
+    }
+
+    private List<String> getGetFeature() {
+        return this.dataBean
+                   .getWFSService()
+                   .findOperation("GetFeature")
+                   .getOutputFormats();
+    }
+
+    private boolean isWfs2simple(ItemModel data, boolean datasetAvailable) {
+        return data instanceof StoredQueryModel
+                   || (!datasetAvailable
+                           && downloadConfig
+                                  .getServiceType()
+                                  .equals("WFS2_SIMPLE"));
+    }
+
+    private boolean isWfs2basic(ItemModel data, boolean datasetAvailable) {
+        return data instanceof FeatureModel
+                   || (!datasetAvailable
+                           && downloadConfig
+                                  .getServiceType()
+                                  .equals("WFS2_BASIC"));
+    }
+
+    private void chooseWFS2Basic(ItemModel data, boolean datasetAvailable) {
+        this.simpleWFSContainer.setVisible(false);
+        this.basicWFSContainer.setVisible(true);
+        this.mapNodeWFS.setVisible(true);
+        this.atomContainer.setVisible(false);
+        this.basicWFSX1Y1.setVisible(true);
+        this.basicWFSX2Y2.setVisible(true);
+        this.referenceSystemChooser.setVisible(true);
+        this.referenceSystemChooserLabel.setVisible(true);
+        WFSMeta.Feature feature;
+        if (datasetAvailable) {
+            feature = (WFSMeta.Feature) data.getItem();
+        } else {
+            feature = new WFSMeta.Feature();
+        }
+        mapWFS.setExtend(feature.getBBox());
+        ArrayList<String> list = new ArrayList<>();
+        list.add(feature.getDefaultCRS());
+        list.addAll(feature.getOtherCRSs());
+        ObservableList<CRSModel> crsList =
+            FXCollections.observableArrayList();
+        for (String crsStr : list) {
+            try {
+                String newcrsStr = crsStr;
+                String seperator = null;
+                if (newcrsStr.contains("::")) {
+                    seperator = "::";
+                } else if (newcrsStr.contains("/")) {
+                    seperator = "/";
+                }
+                if (seperator != null) {
+                    newcrsStr = "EPSG:"
+                                    + newcrsStr.substring(
+                        newcrsStr.lastIndexOf(seperator)
+                            + seperator.length(),
+                        newcrsStr.length());
+                }
+                CoordinateReferenceSystem crs = CRS.decode(newcrsStr);
+                CRSModel crsm = new CRSModel(crs);
+                crsm.setOldName(crsStr);
+                crsList.add(crsm);
+            } catch (FactoryException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
+        if (!crsList.isEmpty()) {
+            this.referenceSystemChooser.setItems(crsList);
+            CRSModel crsm = crsList.get(0);
+            try {
+                CoordinateReferenceSystem initCRS = CRS.decode(
+                    INITIAL_CRS_DISPLAY);
+                CRSModel initCRSM = new CRSModel(initCRS);
+                for (int i = 0; i < crsList.size(); i++) {
+                    if (crsList.get(i).equals(initCRSM)) {
+                        crsm = crsList.get(i);
+                        break;
+                    }
+                }
+            } catch (FactoryException e) {
+                log.log(Level.SEVERE, e.getMessage(), e);
+            }
+            this.referenceSystemChooser.setValue(crsm);
+        }
+        List<String> outputFormats = getGetFeature();
+
+        if (outputFormats.isEmpty()) {
+            outputFormats =
+                this.dataBean.getWFSService().getOutputFormats();
+        }
+        List<OutputFormatModel> formatModels = new ArrayList<>();
+        for (String s : outputFormats) {
+            OutputFormatModel m = new OutputFormatModel();
+            m.setItem(s);
+            m.setAvailable(true);
+            formatModels.add(m);
+        }
+        ObservableList<OutputFormatModel> formats =
+            FXCollections.observableArrayList(formatModels);
+        this.dataFormatChooser.setItems(formats);
     }
 
     /**
