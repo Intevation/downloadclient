@@ -436,7 +436,7 @@ public class Controller {
      * @return The chosen file
      * @throws Exception Exception
      */
-    private File openConfigFileOpenDialog() throws Exception {
+    private File openConfigFileOpenDialog() {
         FileChooser fileChooser = new FileChooser();
         File initialDir = new File(System.getProperty(USER_DIR));
         fileChooser.setInitialDirectory(initialDir);
@@ -1236,7 +1236,7 @@ public class Controller {
             ObservableList<Node> children
                 = this.simpleWFSContainer.getChildren();
             for (Node n : children) {
-                if (!(n.getClass() == HBox.class)) {
+                if (n.getClass() != HBox.class) {
                     continue;
                 }
                 HBox hbox = (HBox) n;
