@@ -37,6 +37,7 @@ import de.bayern.gdi.services.WFSMeta;
 import de.bayern.gdi.services.WFSMetaExtractor;
 import de.bayern.gdi.utils.DownloadListener;
 import de.bayern.gdi.utils.I18n;
+import de.bayern.gdi.utils.InputValidator;
 import de.bayern.gdi.utils.Misc;
 import de.bayern.gdi.utils.SelectedAtomPolygon;
 import de.bayern.gdi.utils.logging.AppLog;
@@ -93,7 +94,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -274,11 +274,103 @@ public class Controller {
     @FXML
     private MenuBar menuBar;
 
+    private InputValidator inputValidator;
+
+    /**
+     * Gets the attributes of the databean.
+     * @return attributes
+     */
+    public List<DataBean.Attribute> getAttributesOfDataBean() {
+        return dataBean.getAttributes();
+    }
+
+    /**
+     * Shows whether the download config is set.
+     * @return true, if so
+     */
+    public boolean isDownloadConfigSet() {
+        return downloadConfig != null;
+    }
+
+    /**
+     * Shows whether the atom container is visible.
+     * @return true, if so
+     */
+    public boolean isAtomContainerVisible() {
+        return atomContainer.isVisible();
+    }
+
+    /**
+     * Shows whether the atom variationchooser is a misch item model.
+     * @return true, if so
+     */
+    public boolean isAtomVariationChooserAMiscItemModel() {
+        return atomVariationChooser
+                   .getValue() instanceof MiscItemModel;
+    }
+
+    /**
+     * Shows whether the referencesystem chooser is visible.
+     * @return true, if so
+     */
+    public boolean isReferenceSystemChooserVisible() {
+        return referenceSystemChooser.isVisible();
+    }
+
+    /**
+     * Shows whether the referencesystem chooser is not available.
+     * @return true, if so
+     */
+    public boolean isReferenceSystemChooserNotAvailable() {
+        return !referenceSystemChooser.getValue().isAvailable();
+    }
+
+    /**
+     * Shows whether the basicWFSContainer is visible.
+     * @return true, if so.
+     */
+    public boolean isBasicWFSContainerVisible() {
+        return basicWFSContainer.isVisible();
+    }
+
+    /**
+     * Shows whether dataFormatChooser is visible.
+     * @return true, ifso
+     */
+    public boolean isDataFormatChooserVisible() {
+        return dataFormatChooser.isVisible();
+    }
+
+    /**
+     * Shows whether the dataformatchooser is not available.
+     * @return true, if so
+     */
+    public boolean isDataFormatChooserNotAvailable() {
+        return !dataFormatChooser.getValue().isAvailable();
+    }
+
+    /**
+     * Shows whether the simplewfscontainer is visible.
+     * @return true, if so
+     */
+    public boolean isSimpleWFSContainerVisible() {
+        return simpleWFSContainer.isVisible();
+    }
+
+    /**
+     * Retrieves children of simpleWFSContainer.
+     * @return the some nodes
+     */
+    public ObservableList<Node> getSimpleWFSContainerChildren() {
+        return simpleWFSContainer.getChildren();
+    }
+
     /**
      * Creates the Controller.
      */
     public Controller() {
         this.factory = new UIFactory();
+        this.inputValidator = new InputValidator(this);
         Processor.getInstance().addListener(new DownloadListener(this));
     }
 
@@ -1332,71 +1424,7 @@ public class Controller {
     }
 
     private boolean validateInput() {
-        final StringBuilder failed = new StringBuilder();
-
-        Consumer<String> fail = s -> {
-            if (failed.length() != 0) {
-                failed.append(", ");
-            }
-            failed.append(s);
-        };
-
-        for (DataBean.Attribute attr : this.dataBean.getAttributes()) {
-            if (!attr.getType().isEmpty()
-                    && !Validator.isValid(attr.getType(), attr.getValue())) {
-                fail.accept(attr.getName());
-            }
-        }
-
-        if (downloadConfig != null) {
-            if (serviceTypeChooser.isVisible()
-                    && serviceTypeChooser.getValue() instanceof MiscItemModel) {
-                fail.accept(I18n.format("gui.dataset"));
-            }
-
-            if (atomContainer.isVisible()
-                    && atomVariationChooser
-                           .getValue() instanceof MiscItemModel) {
-                fail.accept(I18n.format("gui.variants"));
-            }
-
-            if (referenceSystemChooser.isVisible()
-                    && !referenceSystemChooser.getValue().isAvailable()) {
-                fail.accept(I18n.format("gui.reference-system"));
-            }
-
-            if (basicWFSContainer.isVisible()
-                    && dataFormatChooser.isVisible()
-                    && !dataFormatChooser.getValue().isAvailable()) {
-                fail.accept(I18n.format("gui.data-format"));
-            }
-
-            if (simpleWFSContainer.isVisible()) {
-                ObservableList<Node> children
-                    = simpleWFSContainer.getChildren();
-                for (Node node : children) {
-                    if (node instanceof HBox) {
-                        HBox hb = (HBox) node;
-                        Node n2 = hb.getChildren().get(1);
-                        if (n2 instanceof ComboBox) {
-                            ComboBox<OutputFormatModel> cb
-                                = (ComboBox<OutputFormatModel>) n2;
-                            if (!cb.getValue().isAvailable()) {
-                                fail.accept(I18n.format("gui.data-format"));
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (failed.length() == 0) {
-            return true;
-        }
-        setStatusTextUI(
-            I18n.format("status.validation-fail", failed.toString()));
-        return false;
+        return inputValidator.validate();
     }
 
     /**
