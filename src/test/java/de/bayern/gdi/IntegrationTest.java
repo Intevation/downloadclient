@@ -19,7 +19,6 @@ package de.bayern.gdi;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -65,6 +64,7 @@ public class IntegrationTest extends TestBase {
 
     /**
      * Before wait for Ready state.
+     *
      * @throws Exception just in case
      */
     @Before
@@ -188,12 +188,21 @@ public class IntegrationTest extends TestBase {
         clickOn(ACTIVATE_FURTHER_PROCESSING);
         clickOn(ADD_PROCESSING_STEP);
         assertFalse(isEmpty(PROCESS_SELECTION));
-        IntStream.range(1, TOTAL_NUMBER_OF_SERVICES - 1).forEach(i -> {
-                selectDataFormatByNumber(i);
-                clickOn(SERVICE_TYPE_CHOOSER);
-            }
-        );
+        clickOnSomeComboBoxItems(SERVICE_TYPE_CHOOSER);
+    }
 
+    /**
+     * Enter something. Wait. Change search.
+     *
+     * @throws Exception in case
+     */
+    @Test
+    public void switchSearchterm() throws Exception {
+        clickOn(SEARCH).write(VERWALTUNGSGRENZEN);
+        waitForPopulatedServiceList();
+        clickOn(SEARCH).write(BIERGARTEN);
+        waitForPopulatedServiceList();
+        assertFalse(isEmpty(SERVICE_LIST));
     }
 
 }

@@ -45,6 +45,7 @@ import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 import org.junit.BeforeClass;
 import org.testfx.framework.junit.ApplicationTest;
 
@@ -375,7 +376,20 @@ public class TestBase extends ApplicationTest {
      */
     private void selectComboBoxOption(int index, String combobox) {
         ComboBox box = getElementById(combobox, ComboBox.class);
-        box.getSelectionModel().select(index);
+        box.getSelectionModel().clearAndSelect(index);
+    }
+
+    /**
+     * Click every Item in a Combobox.
+     *
+     * @param boxName name of Element
+     */
+    void clickOnSomeComboBoxItems(String boxName) {
+        ComboBox box = getElementById(boxName, ComboBox.class);
+        IntStream.range(0, 2).forEach(item -> clickOn(
+            box.getItems().get(item).toString())
+        );
+
     }
 
     /**
