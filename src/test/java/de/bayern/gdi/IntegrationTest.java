@@ -17,8 +17,14 @@
  */
 package de.bayern.gdi;
 
+import de.bayern.gdi.model.DownloadStep;
+import de.bayern.gdi.utils.DownloadConfiguration;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -61,6 +67,8 @@ public class IntegrationTest extends TestBase {
         "http://geoserv.weichand.de:8080/geoserver/wfs?service="
             + "wfs&acceptversions=2.0.0"
             + "&request=GetCapabilities";
+    private static final DownloadConfiguration DOWNLOAD_CONFIGURATION =
+        new DownloadConfiguration();
 
     /**
      * Before wait for Ready state.
@@ -203,6 +211,25 @@ public class IntegrationTest extends TestBase {
         clickOn(SEARCH).write(BIERGARTEN);
         waitForPopulatedServiceList();
         assertFalse(isEmpty(SERVICE_LIST));
+    }
+
+    /**
+     * Start biergarten download.
+     *
+     * @throws Exception just in case
+     */
+    @Test
+    public void testDownloadOf() throws Exception {
+        String dirname = "gdiBY";
+        Path tempPath = Files.createTempDirectory(dirname);
+        String config = DOWNLOAD_CONFIGURATION.getSimpleConfiguration(
+            tempPath.toString());
+        List<DownloadStep> steps = new ArrayList<>();
+        steps.add(DownloadStep.read(config));
+        String username = "";
+        String password = "";
+        int result = Headless.runHeadless(username, password, steps);
+        assertTrue(result == 0);
     }
 
 }
